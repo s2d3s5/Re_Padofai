@@ -1,0 +1,41 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
+[application]
+
+config/name="re_padofai"
+config/version="0.1"
+run/main_scene="uid://dcw0deo7siu0j"
+config/features=PackedStringArray("4.7", "C#", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[audio]
+
+driver/output_latency=40
+
+[display]
+
+window/stretch/mode="canvas_items"
+window/vsync/vsync_mode=3
+
+[dotnet]
+
+project/assembly_name="re_padofai"
+
+[rendering]
+
+occlusion_culling/bvh_build_quality=1
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.61397964, 0.61397964, 0.6139796, 1)

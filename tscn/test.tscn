@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dn0v15uf2vv2v"]
+
+[ext_resource type="Texture2D" uid="uid://c043p3i6x1bla" path="res://tex/fiy-light2.png" id="1_j3pou"]
+[ext_resource type="Script" uid="uid://cmon0pg28cgpr" path="res://tscn/Sprite2d.cs" id="2_byqc0"]
+
+[node name="Test" type="Node2D" unique_id=1225899435]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=485059241]
+position = Vector2(594, 338)
+texture = ExtResource("1_j3pou")
+script = ExtResource("2_byqc0")
+
+[connection signal="draw" from="." to="Sprite2D" method="_on_test_draw"]

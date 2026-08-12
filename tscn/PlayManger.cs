@@ -43,7 +43,7 @@ public partial class PlayManger : Node
     public Viewport v;
     public override void _Ready()
     {
-        render_mode=true;
+        //render_mode=true;
         ballpos = 0;
         muice_node = muice;
         storageNode = GetNode("../存储");
@@ -76,14 +76,12 @@ public partial class PlayManger : Node
             EmitSignal("start_to_play");
             _on_start_to_play();
             video_player.Call("set_stream_position",video_pos);
-            GD.Print(video_pos);
             video_player.Call("play");
             video_player.Set("loop",settingDict["loopVideo"].As<bool>());
             if (render_mode)
             {
                 // 年 月 日 时 分 秒 纯数字，安全无特殊符号
                 Godot.Collections.Dictionary timeInfo = Time.GetDatetimeDictFromSystem();
-
                 int year = timeInfo["year"].As<int>();
                 int month = timeInfo["month"].As<int>();
                 int day = timeInfo["day"].As<int>();

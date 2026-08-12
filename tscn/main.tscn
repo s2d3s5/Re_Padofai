@@ -47,7 +47,7 @@ offset_left = -104.0
 offset_top = -48.0
 offset_right = 393.0
 offset_bottom = 92.0
-title = "控制"
+title = "Control"
 
 [node name="main" type="VBoxContainer" parent="CanvasLayer/Control/Foldable" unique_id=1669987271]
 layout_mode = 2
@@ -57,7 +57,7 @@ layout_mode = 2
 
 [node name="input" type="Button" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=1699840707]
 layout_mode = 2
-text = "选择文件"
+text = "Select File"
 script = ExtResource("3_8kplt")
 
 [node name="FileDialog" type="FileDialog" parent="CanvasLayer/Control/Foldable/main/buttons/input" unique_id=318743193]
@@ -70,7 +70,7 @@ show_hidden_files = true
 
 [node name="calule" type="Button" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=284274431]
 layout_mode = 2
-text = "导入计算"
+text = "Calculating File"
 script = ExtResource("4_ao1ln")
 
 [node name="Timer" type="Timer" parent="CanvasLayer/Control/Foldable/main/buttons/calule" unique_id=1190099566]
@@ -79,7 +79,7 @@ one_shot = true
 
 [node name="play" type="Button" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=890548084]
 layout_mode = 2
-text = "运行"
+text = "Run"
 
 [node name="Label" type="Label" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=1364117853]
 layout_mode = 2
@@ -89,7 +89,7 @@ horizontal_alignment = 2
 [node name="file_path" type="TextEdit" parent="CanvasLayer/Control/Foldable/main" unique_id=1226213237]
 layout_mode = 2
 size_flags_vertical = 3
-placeholder_text = "输入文件位置……"
+placeholder_text = "Input your file path here"
 
 [node name="info" type="Label" parent="CanvasLayer" unique_id=533932158]
 offset_right = 1.0

@@ -10,7 +10,6 @@ var tracks
 
 func _on_play_start_to_play() -> void:
 	if !is_play:
-	
 		is_play=true
 		tracks=$"../../存储".adofai_data.tracks
 		while play_manger.doing=="play":
@@ -24,7 +23,6 @@ func inverse_add_follow(player_pos:Vector2) -> void:
 	var current_time = play_manger.get_time()
 	var duration = 120.0 / tracks[ball_pos].bpm
 	var t = current_time - cutting_time
-	#print(t)
 	var x = map_range_clamp(t, 0.0, duration, cuttingpos.x, player_pos.x)
 	var y = map_range_clamp(t, 0.0, duration, cuttingpos.y, player_pos.y)
 	position = Vector2(x, y)
@@ -43,9 +41,9 @@ func map_range_clamp(value: float, in_min: float, in_max: float, out_min: float,
 
 func _on_play_ball_hitting(ball_pos) -> void:
 	cutting_time=play_manger.times[ball_pos]+play_manger.offest
-	print(ball_pos)
 	cuttingpos=position
 
 
 func _on_play_pressed() -> void:
+	#每次按开始怎么都回不来😡
 	set_deferred("position",Vector2.ZERO)

@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://duaxh7htk1py7"]
+
+[ext_resource type="Script" uid="uid://bc7h8c17q8rlb" path="res://new/input.gd" id="1_8yiel"]
+[ext_resource type="Script" uid="uid://bl21psgq2fnyb" path="res://new/tiles.gd" id="2_7luoh"]
+[ext_resource type="Script" uid="uid://cdcsnjetcara" path="res://new/save_surver.gd" id="2_ojlxs"]
+[ext_resource type="Script" uid="uid://eb32a1mfpnol" path="res://new/adofai_loder.gd" id="3_jhfko"]
+[ext_resource type="Script" uid="uid://2xj3we33u4s0" path="res://new/force_fps.gd" id="5_pfvea"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_canst"]
+radius = 22.5
+height = 45.0
+radial_segments = 4
+rings = 8
+
+[node name="Game" type="Node2D" unique_id=1323833912]
+
+[node name="ui" type="CanvasLayer" parent="." unique_id=477821411]
+
+[node name="FoldableControl" type="FoldableContainer" parent="ui" unique_id=1195241820]
+offset_right = 351.0
+offset_bottom = 70.0
+title = "Control"
+
+[node name="button" type="HBoxContainer" parent="ui/FoldableControl" unique_id=258339469]
+layout_mode = 2
+
+[node name="input" type="Button" parent="ui/FoldableControl/button" unique_id=941343804]
+layout_mode = 2
+text = "Input"
+script = ExtResource("1_8yiel")
+
+[node name="FileDialog" type="FileDialog" parent="ui/FoldableControl/button/input" unique_id=2096562817]
+title = "Open a File"
+position = Vector2i(200, 200)
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.json", "*.adofai")
+
+[node name="load" type="Button" parent="ui/FoldableControl/button" unique_id=144872214]
+layout_mode = 2
+text = "Load"
+
+[node name="playandstop" type="Button" parent="ui/FoldableControl/button" unique_id=502707481]
+layout_mode = 2
+text = "Play"
+
+[node name="info" type="Label" parent="ui/FoldableControl/button" unique_id=47210468]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="World" type="Node2D" parent="." unique_id=281706575]
+
+[node name="Camera2D" type="Camera2D" parent="World" unique_id=738502910]
+
+[node name="Tiles" type="Node" parent="World" unique_id=634442880]
+script = ExtResource("2_7luoh")
+
+[node name="ice" type="MeshInstance2D" parent="World" unique_id=398955682]
+modulate = Color(0, 0, 1, 1)
+mesh = SubResource("SphereMesh_canst")
+
+[node name="fire" type="MeshInstance2D" parent="World" unique_id=961100971]
+modulate = Color(1, 0, 0, 1)
+mesh = SubResource("SphereMesh_canst")
+
+[node name="main" type="Node" parent="World" unique_id=2097845927]
+
+[node name="SaveSurver" type="Node" parent="." unique_id=1113178165]
+script = ExtResource("2_ojlxs")
+
+[node name="AdofaiLoder" type="Node" parent="." unique_id=1801833525]
+script = ExtResource("3_jhfko")
+
+[node name="force_fps" type="Timer" parent="." unique_id=1214573472]
+wait_time = 0.2
+autostart = true
+ignore_time_scale = true
+script = ExtResource("5_pfvea")
+
+[connection signal="pressed" from="ui/FoldableControl/button/input" to="ui/FoldableControl/button/input" method="_on_pressed"]
+[connection signal="file_selected" from="ui/FoldableControl/button/input/FileDialog" to="SaveSurver" method="_on_file_dialog_file_selected"]
+[connection signal="pressed" from="ui/FoldableControl/button/load" to="AdofaiLoder" method="_on_load_pressed"]
+[connection signal="pressed" from="ui/FoldableControl/button/playandstop" to="World/Tiles" method="_on_playandstop_pressed"]
+[connection signal="timeout" from="force_fps" to="force_fps" method="_on_timeout"]

@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://c4ut0githw0t"]
+
+[ext_resource type="Script" uid="uid://c3wjygmrtguel" path="res://code/summon_new_windows.gd" id="1_wdxtp"]
+
+[node name="Editor" type="Node" unique_id=1888900603]
+
+[node name="Button" type="Button" parent="." unique_id=600954319]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "new windows"
+script = ExtResource("1_wdxtp")

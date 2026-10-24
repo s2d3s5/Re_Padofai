@@ -1,0 +1,214 @@
+[gd_scene format=3 uid="uid://dcw0deo7siu0j"]
+
+[ext_resource type="Script" uid="uid://c2glfdl4yc13" path="res://tscn/存储.gd" id="1_a7rub"]
+[ext_resource type="Script" uid="uid://drliknqt2cl4q" path="res://code/caluleing_adofai.gd" id="2_g6ans"]
+[ext_resource type="Script" uid="uid://dc8j7un6e216y" path="res://tscn/openchoose.gd" id="3_8kplt"]
+[ext_resource type="Script" uid="uid://degsbfmhkc2t6" path="res://tscn/calule.gd" id="4_ao1ln"]
+[ext_resource type="Script" uid="uid://cd6gqimqeuhic" path="res://tscn/fullscreen.gd" id="5_d2uin"]
+[ext_resource type="Script" uid="uid://dlg4uw0ikbcba" path="res://tscn/summon_track.gd" id="5_g6ans"]
+[ext_resource type="Script" uid="uid://xamvdblg2t3n" path="res://tscn/info.gd" id="5_mn4ff"]
+[ext_resource type="Script" uid="uid://btnu3ktaesn5" path="res://tscn/camera_moving.gd" id="6_ap273"]
+[ext_resource type="Script" uid="uid://c1s6lsoi7vlp6" path="res://tscn/PlayManger.cs" id="6_mn4ff"]
+[ext_resource type="AudioStream" uid="uid://cbryxnjsm2bsk" path="res://hit.wav" id="6_q8ief"]
+[ext_resource type="Script" uid="uid://c7bcpdi5v74hb" path="res://tscn/moving_ball.gd" id="8_ap273"]
+[ext_resource type="Texture2D" uid="uid://c043p3i6x1bla" path="res://tex/fiy-light2.png" id="10_8d387"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_8d387"]
+radius = 22.5
+height = 45.0
+radial_segments = 4
+rings = 6
+
+[sub_resource type="Curve" id="Curve_8d387"]
+bake_resolution = 1
+_data = [Vector2(0, 1), 0.0, -1.0, 0, 1, Vector2(1, 0), -1.0, 0.0, 1, 0]
+point_count = 2
+
+[node name="game" type="Node2D" unique_id=280146968]
+
+[node name="存储" type="Node" parent="." unique_id=509655075]
+script = ExtResource("1_a7rub")
+
+[node name="adofai计算区" type="Node" parent="." unique_id=2133084261]
+script = ExtResource("2_g6ans")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1457066073]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=1207779720]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 431.0
+offset_top = 46.0
+offset_right = 447.0
+offset_bottom = 46.0
+
+[node name="Foldable" type="FoldableContainer" parent="CanvasLayer/Control" unique_id=1362653086]
+layout_mode = 0
+offset_left = -104.0
+offset_top = -48.0
+offset_right = 393.0
+offset_bottom = 54.0
+title = "Control"
+
+[node name="main" type="VBoxContainer" parent="CanvasLayer/Control/Foldable" unique_id=1669987271]
+layout_mode = 2
+
+[node name="buttons" type="HBoxContainer" parent="CanvasLayer/Control/Foldable/main" unique_id=2101631807]
+layout_mode = 2
+
+[node name="input" type="Button" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=1699840707]
+layout_mode = 2
+text = "Select File"
+script = ExtResource("3_8kplt")
+
+[node name="FileDialog" type="FileDialog" parent="CanvasLayer/Control/Foldable/main/buttons/input" unique_id=318743193]
+title = "Open a File"
+position = Vector2i(50, 50)
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.adofai")
+show_hidden_files = true
+
+[node name="calule" type="Button" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=284274431]
+layout_mode = 2
+text = "Calculating File"
+script = ExtResource("4_ao1ln")
+
+[node name="Timer" type="Timer" parent="CanvasLayer/Control/Foldable/main/buttons/calule" unique_id=1190099566]
+wait_time = 3.0
+one_shot = true
+
+[node name="play" type="Button" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=890548084]
+layout_mode = 2
+text = "Run"
+
+[node name="Button" type="Button" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=634479518]
+layout_mode = 2
+text = "FullScreen"
+script = ExtResource("5_d2uin")
+
+[node name="Label" type="Label" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=1364117853]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="file_path" type="LineEdit" parent="CanvasLayer/Control/Foldable/main" unique_id=1722470462]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Please enter your file path here"
+
+[node name="info" type="Label" parent="CanvasLayer" unique_id=533932158]
+offset_right = 1.0
+offset_bottom = 23.0
+script = ExtResource("5_mn4ff")
+
+[node name="play" type="Node" parent="." unique_id=1484386639 node_paths=PackedStringArray("muice", "hit", "storageNode")]
+script = ExtResource("6_mn4ff")
+muice = NodePath("muice")
+hit = NodePath("hit")
+storageNode = NodePath("../存储")
+
+[node name="ui" type="CanvasLayer" parent="play" unique_id=906965088]
+layer = -1
+
+[node name="video" type="VideoStreamPlayer" parent="play/ui" unique_id=1091306131]
+volume_db = -80.0
+autoplay = true
+expand = true
+
+[node name="Camera2D" type="Camera2D" parent="play" unique_id=1331576500]
+scale = Vector2(2, 2)
+ignore_rotation = false
+zoom = Vector2(0.5, 0.5)
+limit_enabled = false
+script = ExtResource("6_ap273")
+
+[node name="bg" type="ColorRect" parent="play/Camera2D" unique_id=80261118]
+visible = false
+z_index = -1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -579.0
+offset_top = -327.0
+offset_right = 579.0
+offset_bottom = 327.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="qm" type="ColorRect" parent="play/Camera2D" unique_id=487984939]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -579.0
+offset_top = -327.0
+offset_right = 579.0
+offset_bottom = 327.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="muice" type="AudioStreamPlayer" parent="play" unique_id=579717917]
+volume_db = -5.0
+
+[node name="hit" type="AudioStreamPlayer" parent="play" unique_id=1738590207]
+stream = ExtResource("6_q8ief")
+max_polyphony = 100
+
+[node name="tiles" type="Node" parent="play" unique_id=620723270]
+script = ExtResource("5_g6ans")
+pool_size = 100
+pool_max_size = 1145141
+
+[node name="red" type="MeshInstance2D" parent="play" unique_id=1364666287]
+modulate = Color(1, 0, 0, 1)
+position = Vector2(49, 0)
+mesh = SubResource("SphereMesh_8d387")
+script = ExtResource("8_ap273")
+metadata/is_ice = false
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="play/red" unique_id=1049516116]
+amount = 128
+texture = ExtResource("10_8d387")
+lifetime = 0.25
+direction = Vector2(0, 0)
+gravity = Vector2(0, 0)
+scale_amount_min = 0.1
+scale_amount_max = 0.25
+scale_amount_curve = SubResource("Curve_8d387")
+
+[node name="blue" type="MeshInstance2D" parent="play" unique_id=273511399]
+modulate = Color(0, 0, 1, 1)
+mesh = SubResource("SphereMesh_8d387")
+script = ExtResource("8_ap273")
+a = 4.255
+metadata/is_ice = true
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="play/blue" unique_id=461073269]
+amount = 128
+texture = ExtResource("10_8d387")
+lifetime = 0.25
+direction = Vector2(0, 0)
+gravity = Vector2(0, 0)
+scale_amount_min = 0.1
+scale_amount_max = 0.25
+scale_amount_curve = SubResource("Curve_8d387")
+
+[connection signal="input_over" from="adofai计算区" to="CanvasLayer/Control/Foldable/main/buttons/calule" method="_on_adofai计算区_input_over"]
+[connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/input" to="CanvasLayer/Control/Foldable/main/buttons/input" method="_on_pressed"]
+[connection signal="file_selected" from="CanvasLayer/Control/Foldable/main/buttons/input/FileDialog" to="CanvasLayer/Control/Foldable/main/buttons/input" method="_on_file_dialog_file_selected"]
+[connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/calule" to="adofai计算区" method="_on_calule_pressed"]
+[connection signal="timeout" from="CanvasLayer/Control/Foldable/main/buttons/calule/Timer" to="CanvasLayer/Control/Foldable/main/buttons/calule" method="_on_timer_timeout"]
+[connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/play" to="play" method="_on_play_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/play" to="play/Camera2D" method="_on_play_pressed"]
+[connection signal="text_submitted" from="CanvasLayer/Control/Foldable/main/file_path" to="CanvasLayer/Control/Foldable/main/buttons/input" method="_on_file_path_text_submitted"]
+[connection signal="ball_hitting" from="play" to="play/Camera2D" method="_on_play_ball_hitting"]
+[connection signal="place_tile" from="play" to="play/tiles" method="_on_play_place_tile"]
+[connection signal="start_to_play" from="play" to="play/Camera2D" method="_on_play_start_to_play"]
+[connection signal="start_to_play" from="play" to="play/red" method="_on_play_start_to_play"]
+[connection signal="start_to_play" from="play" to="play/blue" method="_on_play_start_to_play"]

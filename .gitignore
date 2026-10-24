@@ -1,0 +1,8 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+export/re-adofai.exe
+export/
+export/
+*.import
+*.log

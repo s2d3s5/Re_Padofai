@@ -1,0 +1,30 @@
+# Godot 引擎自动生成缓存文件
+.godot/
+.import/
+*.import
+*.tmp
+export.cfg
+export_presets.cfg
+export_credentials.cfg
+*.translation
+
+# Mono C#项目缓存（C#脚本必加）
+.mono/
+data_*/
+mono_crash.*.json
+
+# 打包导出产物
+bin/
+build/
+*.exe
+*.dll
+*.so
+*.apk
+*.zip
+
+# 系统、编辑器杂项
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+logs/

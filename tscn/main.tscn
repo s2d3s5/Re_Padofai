@@ -82,6 +82,11 @@ one_shot = true
 layout_mode = 2
 text = "Run"
 
+[node name="stop" type="Button" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=1736263945]
+visible = false
+layout_mode = 2
+text = "Stop"
+
 [node name="Button" type="Button" parent="CanvasLayer/Control/Foldable/main/buttons" unique_id=634479518]
 layout_mode = 2
 text = "FullScreen"
@@ -206,6 +211,7 @@ scale_amount_curve = SubResource("Curve_8d387")
 [connection signal="timeout" from="CanvasLayer/Control/Foldable/main/buttons/calule/Timer" to="CanvasLayer/Control/Foldable/main/buttons/calule" method="_on_timer_timeout"]
 [connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/play" to="play" method="_on_play_pressed"]
 [connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/play" to="play/Camera2D" method="_on_play_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/stop" to="play" method="_on_stop_pressed"]
 [connection signal="text_submitted" from="CanvasLayer/Control/Foldable/main/file_path" to="CanvasLayer/Control/Foldable/main/buttons/input" method="_on_file_path_text_submitted"]
 [connection signal="ball_hitting" from="play" to="play/Camera2D" method="_on_play_ball_hitting"]
 [connection signal="place_tile" from="play" to="play/tiles" method="_on_play_place_tile"]

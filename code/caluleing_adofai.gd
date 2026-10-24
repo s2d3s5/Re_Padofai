@@ -102,14 +102,17 @@ func _on_calule_pressed() -> void:
 			printerr("无法读取该adofai")
 			return
 		adofai_d={}
-		creat_track(data)
-		count_delta_angle(data)
-		count_time(data)
-		count_chunk(data)
-		input_muice(data)
-		input_video(data)
-		
-		sending_data(data)
+		if data.angledata.size()>0:
+			creat_track(data)
+			count_delta_angle(data)
+			count_time(data)
+			count_chunk(data)
+			input_muice(data)
+			input_video(data)
+			sending_data(data)
+		else:
+			printerr("关卡是空的，没有任何角度数据，无法读取！")
+			return
 		emit_signal("input_over",Time.get_unix_time_from_system()-cuttingtime)
 
 func input_adofai_by_path(path:String)->void:
@@ -281,7 +284,7 @@ func input_muice(data)->void:
 			stream=null
 			return
 
-var video_stream:NativeVideoStream=NativeVideoStream.new()
+var video_stream:NativeVideoStream=null
 
 func input_video(data)->void:
 	var setting=data.setting
@@ -293,9 +296,12 @@ func input_video(data)->void:
 		if not FileAccess.file_exists(bgVideo_path):
 			video_stream = null
 			push_warning(str("视频缺失，无法加载：",bgVideo_path))
+			video_stream=null
 			return
+		video_stream=NativeVideoStream.new()
 		video_stream.file=bgVideo_path
-	video_stream=null
+	else:
+		video_stream=null
 
 func sending_data(data:AdofaiData)->void:
 	var save_target = $"../存储".adofai_data

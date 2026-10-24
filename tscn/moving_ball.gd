@@ -12,14 +12,18 @@ func _ready() -> void:
 	position=Vector2.ZERO
 	set_deferred("process_mode",PROCESS_MODE_DISABLED)
 func _process(_delta: float) -> void:
-	var ball_pos=play_manger.ballpos
-	var tile:Track=tracks[ball_pos]
-	if (ball_pos%2==0)==is_ice:
-		var way=float(0.0-(angle_data[ball_pos]))-((((play_manger.get_time()-times[clampi(ball_pos+1,0,times.size()-1)]-play_manger.offest)*-180)*tile.bpm/60))*tile.way
-		way=deg_to_rad(way)
-		position=Vector2(cos(way)*90,sin(way)*90)+tile.pos
+	if play_manger.get("doing")=="play":
+		var ball_pos=play_manger.ballpos
+		if tracks.size()>0:
+			var tile:Track=tracks.get(ball_pos)
+			if (ball_pos%2==0)==is_ice:
+				var way=float(0.0-(angle_data[ball_pos]))-((((play_manger.get_time()-times[clampi(ball_pos+1,0,times.size()-1)]-play_manger.offest)*-180)*tile.bpm/60))*tile.way
+				way=deg_to_rad(way)
+				position=Vector2(cos(way)*90,sin(way)*90)+tile.pos
+			else:
+				position=tile.pos
 	else:
-		position=tile.pos
+		visible=false
 func _on_play_start_to_play() -> void:
 	show()
 	times=$"../../存储".adofai_data.times

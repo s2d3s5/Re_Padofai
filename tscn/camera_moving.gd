@@ -48,9 +48,10 @@ func _on_play_ball_hitting(ball_pos) -> void:
 
 
 func _on_play_pressed() -> void:
-	#每次按开始怎么都回不来😡
 	zoom=Vector2.ONE
-	set_deferred("position",Vector2.ZERO)
+	cutting_time=play_manger.get_time()
+	cuttingpos=Vector2.ZERO
+	position=Vector2.ZERO
 
 
 			

@@ -52,12 +52,28 @@ public partial class PlayManger : Node
 		video_player=GetNode<VideoStreamPlayer>("ui/video");
 		v=GetViewport();
 	}
-
+	public void _on_stop_pressed()
+	{
+		doing = "none";
+		GetNode("../CanvasLayer/Control/Foldable/main/buttons/stop").Call("hide");
+		GetNode("../CanvasLayer/Control/Foldable/main/buttons/play").Call("show");
+		GetNode("../CanvasLayer/Control/Foldable/main/buttons/input").Call("show");
+		GetNode("../CanvasLayer/Control/Foldable/main/buttons/calule").Call("show");
+		muice_node.Call("stop");
+		GetNode("tiles").Set("isstart",false);
+		GetNode("tiles").CallDeferred("recical_all");
+		video_player.Call("hide");
+		video_player.Call("stop");
+	}
 	public void _on_play_pressed()
 	{
 		re_time();
 		ballpos = 0;
 		doing = "play";
+		GetNode("../CanvasLayer/Control/Foldable/main/buttons/stop").Call("show");
+		GetNode("../CanvasLayer/Control/Foldable/main/buttons/play").Call("hide");
+		GetNode("../CanvasLayer/Control/Foldable/main/buttons/input").Call("hide");
+		GetNode("../CanvasLayer/Control/Foldable/main/buttons/calule").Call("hide");
 		Dictionary adofai_data = storageNode.Get("adofai_data").As<Dictionary>();
 		if (adofai_data.Count != 0)
 		{
@@ -73,7 +89,6 @@ public partial class PlayManger : Node
 			}
 			else
 			{
-				GD.Print("视频资源为空，跳过视频加载");
 				video_player.Call("hide");
 			}
 			Vector2 windowSize = GetWindow().Size;
@@ -179,10 +194,14 @@ public async void _on_start_to_play()
 					hit.Play();
 				}
 				a++;
-				EmitSignal("ball_hitting", ballpos);
+				if (a>10)
+				{
+					break;
+				}
 				currentTime = get_time();
+				EmitSignal("ball_hitting", ballpos);
 			}
-
+			
 			// a>10 代表本次帧已经连续触发超过10次，改用二分定位
 			if (a > 10 && ballpos < times.Length - 1)
 			{
@@ -208,8 +227,6 @@ public async void _on_start_to_play()
 				if (bestPos > ballpos)
 				{
 					ballpos = bestPos;
-					// 可选：如果需要最后这个位置的事件，取消下一行注释
-					// EmitSignal("ball_hitting", ballpos);
 				}
 			}
 

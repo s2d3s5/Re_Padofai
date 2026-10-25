@@ -189,21 +189,21 @@ public async void _on_start_to_play()
 			while (ballpos < times.Length - 1 && currentTime >= times[ballpos + 1] + offest)
 			{
 				ballpos++;
-				if (a <= 10)
+				if (a <= 2)
 				{
 					hit.Play();
 				}
 				a++;
-				if (a>10)
+				if (a>2)
 				{
 					break;
 				}
-				currentTime = get_time();
 				EmitSignal("ball_hitting", ballpos);
+				currentTime = get_time();
 			}
 			
 			// a>10 代表本次帧已经连续触发超过10次，改用二分定位
-			if (a > 10 && ballpos < times.Length - 1)
+			if (a>2&&ballpos < times.Length - 1)
 			{
 				double target = currentTime - offest;
 				int low = ballpos;
@@ -229,7 +229,7 @@ public async void _on_start_to_play()
 					ballpos = bestPos;
 				}
 			}
-
+			
 			await ToSignal(GetTree(), "process_frame");
 		}
 	}

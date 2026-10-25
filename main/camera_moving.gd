@@ -54,7 +54,3 @@ func _on_play_pressed() -> void:
 	cutting_time=play_manger.get_time()
 	cuttingpos=Vector2.ZERO
 	position=Vector2.ZERO
-
-
-			
-			

@@ -2,76 +2,24 @@ extends Node
 var adofai_d:Dictionary={}
 signal input_over(time:float)
 class AdofaiData extends RefCounted:
-	var angledata:PackedFloat32Array=[]
+	var angledata:PackedFloat32Array=PackedFloat32Array()
 	var setting:Dictionary={}
 	var actions:Array=[]
+	static var angle_map:Dictionary = {
+		"R":0.0,"p":15.0,"J":30.0,"E":45.0,"T":60.0,"o":75.0,"U":90.0,"q":105.0,
+		"G":120.0,"Q":135.0,"H":150.0,"W":165.0,"L":180.0,"x":195.0,"N":210.0,
+		"Z":225.0,"F":240.0,"V":255.0,"D":270.0,"Y":285.0,"B":300.0,"C":315.0,
+		"M":330.0,"A":345.0,"5":555.0,"6":666.0,"7":777.0,"8":888.0,"!":999.0
+	}
 	func for_pathdata(input_str: String) -> float:
-		match input_str:
-			"R":
-				return 0.0
-			"p":
-				return 15.0
-			"J":
-				return 30.0
-			"E":
-				return 45.0
-			"T":
-				return 60.0
-			"o":
-				return 75.0
-			"U":
-				return 90.0
-			"q":
-				return 105.0
-			"G":
-				return 120.0
-			"Q":
-				return 135.0
-			"H":
-				return 150.0
-			"W":
-				return 165.0
-			"L":
-				return 180.0
-			"x":
-				return 195.0
-			"N":
-				return 210.0
-			"Z":
-				return 225.0
-			"F":
-				return 240.0
-			"V":
-				return 255.0
-			"D":
-				return 270.0
-			"Y":
-				return 285.0
-			"B":
-				return 300.0
-			"C":
-				return 315.0
-			"M":
-				return 330.0
-			"A":
-				return 345.0
-			"5":
-				return 555.0
-			"6":
-				return 666.0
-			"7":
-				return 777.0
-			"8":
-				return 888.0
-			"!":
-				return 999.0
-			_:
-				print("未知字符：", input_str)
-				return 0.0
+		if angle_map.has(input_str):
+			return angle_map[input_str]
+		print("未知字符：", input_str)
+		return 0.0
 	func _init(a=[],s={},ac=[]) -> void:
-		angledata=a.duplicate()
-		setting=s.duplicate()
-		actions=ac.duplicate()
+		angledata=a
+		setting=s
+		actions=ac
 	func turn_pathdata_to_angledata(p:String)->void:
 		angledata.clear()
 		for i in range(p.length()):
@@ -85,32 +33,41 @@ var track_pause:PackedFloat32Array = PackedFloat32Array()
 
 func _on_calule_pressed() -> void:
 	var cuttingtime=Time.get_unix_time_from_system()
+	
 	track_pos.clear()
 	track_way.clear()
 	track_showmode.clear()
 	track_bpm.clear()
 	track_pause.clear()
-	delta_angledata = []
+	delta_angledata.clear()
 	times.clear()
 	world_chunk.clear()
-	adofai_d = {}
+	
+	if stream != null:
+		stream = null
+	if video_stream != null:
+		video_stream = null
+	adofai_d.clear()
 	stream = null
-	$"../存储".adofai_data = {}
+	
+	$"../存储".adofai_data.clear()
 	$"../play".doing="none"
 	$"../play".ballpos=0
 	$"../CanvasLayer/Control/Foldable/main/buttons/Label".text="导入失败"
+	
 	input_adofai_by_path($"../存储".adofai_path)
-	if adofai_d!={}:
+	
+	if !adofai_d.is_empty():
 		var data:AdofaiData=null
 		if adofai_d.has("angleData"):
 			data=AdofaiData.new(adofai_d.angleData,adofai_d.settings,adofai_d.actions)
 		elif adofai_d.has("pathData"):
-			data=AdofaiData.new([],adofai_d.settings,adofai_d.actions)
+			data=AdofaiData.new(PackedFloat32Array(),adofai_d.settings,adofai_d.actions)
 			data.turn_pathdata_to_angledata(adofai_d.pathData)
 		else:
 			printerr("无法读取该adofai")
 			return
-		adofai_d={}
+		adofai_d.clear()
 		if data.angledata.size()>0:
 			creat_track(data)
 			count_delta_angle(data)
@@ -123,22 +80,21 @@ func _on_calule_pressed() -> void:
 			printerr("关卡是空的，没有任何角度数据，无法读取！")
 			return
 		emit_signal("input_over",Time.get_unix_time_from_system()-cuttingtime)
+		print()
 
 func input_adofai_by_path(path:String)->void:
 	var file=FileAccess.open(path,FileAccess.READ)
-
 	if file==null:
 		printerr(str("打开文件失败：",FileAccess.get_open_error()))
 		return
-	var adofaistr=file.get_as_text()
 	print("文件大小：",file.get_length()/1024.0/1024.0,"MiB")
-	file.close()
-	adofai_d={}
 	var json=JSON.new()
+	var adofaistr=file.get_as_text()
 	var parse_result = json.parse(adofaistr)
-	
+	adofaistr=null
+	file.close()
 	if parse_result != OK:
-		printerr("文件转化失败",json.get_error_message()," 出现在第",json.get_error_line(),"行")
+		printerr("godot文件转化失败",json.get_error_message()," 出现在第",json.get_error_line(),"行")
 		json=null
 		return
 	if json.data is Dictionary:
@@ -212,7 +168,7 @@ func creat_track(data:AdofaiData)->void:
 		pos_add.x+=cos(angle)*90
 		pos_add.y+=sin(angle)*-90
 
-var delta_angledata:PackedFloat64Array
+var delta_angledata:PackedFloat32Array
 func count_delta_angle(data)->void:
 	var angledata:PackedFloat32Array=data.angledata
 	delta_angledata.clear()
@@ -246,7 +202,7 @@ func count_delta_angle(data)->void:
 		else:
 			delta_angledata.append(ii)
 
-var times:PackedFloat32Array=[]
+var times:PackedFloat32Array=PackedFloat32Array()
 func count_time(_data)->void:
 	times.clear()
 	times.append(0.0)
@@ -275,9 +231,9 @@ func count_chunk(_data)->void:
 		if world_chunk.has(track_lower):
 			world_chunk[track_lower].append(i)
 		else:
-			world_chunk[track_lower] = [i]
+			world_chunk[track_lower] = PackedInt32Array([i])
 			
-var stream=null
+var stream:AudioStream=null
 func input_muice(data)->void:
 	var setting=data.setting
 	var songfile:String=setting.songFilename
@@ -331,3 +287,4 @@ func sending_data(data:AdofaiData)->void:
 	save_target["audio"] = stream
 	save_target["setting"]=data.setting
 	save_target["video_stream"]=video_stream
+	

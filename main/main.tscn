@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://c2glfdl4yc13" path="res://main/存储.gd" id="1_a7rub"]
 [ext_resource type="Script" uid="uid://drliknqt2cl4q" path="res://code/caluleing_adofai.gd" id="2_g6ans"]
 [ext_resource type="Script" uid="uid://dc8j7un6e216y" path="res://main/openchoose.gd" id="3_8kplt"]
+[ext_resource type="Script" uid="uid://c7xve6rtxt0ks" path="res://main/JsonParser.cs" id="3_na0o7"]
 [ext_resource type="Script" uid="uid://degsbfmhkc2t6" path="res://main/calule.gd" id="4_ao1ln"]
 [ext_resource type="Script" uid="uid://cd6gqimqeuhic" path="res://main/fullscreen.gd" id="5_d2uin"]
 [ext_resource type="Script" uid="uid://dlg4uw0ikbcba" path="res://main/summon_track.gd" id="5_g6ans"]
@@ -19,10 +20,26 @@ height = 45.0
 radial_segments = 4
 rings = 6
 
-[sub_resource type="Curve" id="Curve_8d387"]
-bake_resolution = 1
+[sub_resource type="Gradient" id="Gradient_na0o7"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_h2ilc"]
+gradient = SubResource("Gradient_na0o7")
+
+[sub_resource type="Curve" id="Curve_3ta3r"]
 _data = [Vector2(0, 1), 0.0, -1.0, 0, 1, Vector2(1, 0), -1.0, 0.0, 1, 0]
 point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_bwd5o"]
+curve = SubResource("Curve_3ta3r")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_canst"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 98, 0)
+scale_min = 0.17999999
+scale_max = 0.19999999
+scale_curve = SubResource("CurveTexture_bwd5o")
+color_ramp = SubResource("GradientTexture1D_h2ilc")
 
 [node name="game" type="Node2D" unique_id=280146968]
 
@@ -31,6 +48,9 @@ script = ExtResource("1_a7rub")
 
 [node name="adofai计算区" type="Node" parent="." unique_id=2133084261]
 script = ExtResource("2_g6ans")
+
+[node name="JsonParser" type="Node" parent="adofai计算区" unique_id=1883773702]
+script = ExtResource("3_na0o7")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1457066073]
 
@@ -177,15 +197,12 @@ mesh = SubResource("SphereMesh_8d387")
 script = ExtResource("8_ap273")
 metadata/is_ice = false
 
-[node name="CPUParticles2D" type="CPUParticles2D" parent="play/red" unique_id=1049516116]
+[node name="GPUParticles2D" type="GPUParticles2D" parent="play/red" unique_id=830186105]
 amount = 128
 texture = ExtResource("10_8d387")
 lifetime = 0.25
-direction = Vector2(0, 0)
-gravity = Vector2(0, 0)
-scale_amount_min = 0.1
-scale_amount_max = 0.25
-scale_amount_curve = SubResource("Curve_8d387")
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_canst")
 
 [node name="blue" type="MeshInstance2D" parent="play" unique_id=273511399]
 modulate = Color(0, 0, 1, 1)
@@ -194,21 +211,19 @@ script = ExtResource("8_ap273")
 a = 4.255
 metadata/is_ice = true
 
-[node name="CPUParticles2D" type="CPUParticles2D" parent="play/blue" unique_id=461073269]
+[node name="GPUParticles2D" type="GPUParticles2D" parent="play/blue" unique_id=2071921554]
 amount = 128
 texture = ExtResource("10_8d387")
 lifetime = 0.25
-direction = Vector2(0, 0)
-gravity = Vector2(0, 0)
-scale_amount_min = 0.1
-scale_amount_max = 0.25
-scale_amount_curve = SubResource("Curve_8d387")
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_canst")
 
 [connection signal="input_over" from="adofai计算区" to="CanvasLayer/Control/Foldable/main/buttons/calule" method="_on_adofai计算区_input_over"]
 [connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/input" to="CanvasLayer/Control/Foldable/main/buttons/input" method="_on_pressed"]
 [connection signal="file_selected" from="CanvasLayer/Control/Foldable/main/buttons/input/FileDialog" to="CanvasLayer/Control/Foldable/main/buttons/input" method="_on_file_dialog_file_selected"]
 [connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/calule" to="adofai计算区" method="_on_calule_pressed"]
 [connection signal="timeout" from="CanvasLayer/Control/Foldable/main/buttons/calule/Timer" to="CanvasLayer/Control/Foldable/main/buttons/calule" method="_on_timer_timeout"]
+[connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/play" to="CanvasLayer/info" method="cache_bpm_track"]
 [connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/play" to="play" method="_on_play_pressed"]
 [connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/play" to="play/Camera2D" method="_on_play_pressed"]
 [connection signal="pressed" from="CanvasLayer/Control/Foldable/main/buttons/stop" to="play" method="_on_stop_pressed"]

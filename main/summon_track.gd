@@ -20,9 +20,6 @@ static func offset_vector2_array(a:PackedVector2Array, offset:Vector2=Vector2.ZE
 		b[i] += offset
 	return b
 
-func cmp_desc(a, b):
-	return a > b
-
 var world_chunk:Dictionary={}
 var angle:PackedFloat32Array=[]
 var chunk_size:float=90*4.0
@@ -68,7 +65,8 @@ func count_chunk()->void:
 		y+=1
 		x=min_x-1
 		
-	need_drow.sort_custom(cmp_desc)
+	need_drow.sort()
+	need_drow.reverse()
 
 func get_tile_point(ang1:float,ang2:float)->PackedVector2Array:
 	const scale=10
@@ -180,21 +178,22 @@ func recical_all()->void:
 func find_diffrend()->void:
 	must_add.clear()
 	must_remove.clear()
-	# 转HashSet加速存在判断
+	# 只用一个字典存上一帧id集合
 	var last_set:Dictionary = {}
 	for id in last_need_drow:
 		last_set[id] = true
-	var curr_set:Dictionary = {}
+
+	# 遍历当前可见列表
 	for id in need_drow:
-		curr_set[id] = true
-	# 上一帧存在、当前帧不存在 → 需要删除
-	for old_id in last_need_drow:
-		if not curr_set.has(old_id):
-			must_remove.append(old_id)
-	# 当前帧存在、上一帧不存在 → 需要新增
-	for new_id in need_drow:
-		if not last_set.has(new_id):
-			must_add.append(new_id)
+		if last_set.erase(id):
+			# 上一帧有、这一帧也有：保留，不用增删
+			continue
+		# 上一帧没有，这帧新增
+		must_add.append(id)
+
+	# last_set剩下的key = 上帧有、这帧没有 → 需要删除
+	must_remove = last_set.keys()
+
 enum Showmodes
 {
 	NONE,

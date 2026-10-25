@@ -24,13 +24,16 @@ func cmp_desc(a, b):
 	return a > b
 
 var world_chunk:Dictionary={}
-var angle:Array=[]
+var angle:PackedFloat32Array=[]
 var chunk_size:float=90*4.0
 var need_drow:Array = []
-var last_need_drow:Array = []
-var must_add:Array=[]    # 本帧需要新增的赛道id
-var must_remove:Array=[] # 本帧需要删除的赛道id
-var tracks:Array=[Track.new()]
+var last_need_drow:PackedInt32Array = []
+var must_add:PackedInt32Array=[]    # 本帧需要新增的赛道id
+var must_remove:PackedInt32Array=[] # 本帧需要删除的赛道id
+
+var track_pos:PackedVector2Array = PackedVector2Array()
+var track_showmode:PackedByteArray = PackedByteArray()
+
 
 var isstart:bool=false
 
@@ -68,7 +71,10 @@ func count_chunk()->void:
 	need_drow.sort_custom(cmp_desc)
 
 func get_tile_point(ang1:float,ang2:float)->PackedVector2Array:
-	var key = Vector2(ang1, ang2)
+	const scale=10
+	var i1 = int(round(ang1 * scale))
+	var i2 = int(round(ang2 * scale))
+	var key:Vector2i = Vector2i(i1, i2)
 	if tile_point_temp.has(key):
 		return tile_point_temp[key]
 	var point=count_tile.CaculatePoints(ang1,ang2,45/2.0,90/2.0)
@@ -189,7 +195,13 @@ func find_diffrend()->void:
 	for new_id in need_drow:
 		if not last_set.has(new_id):
 			must_add.append(new_id)
-
+enum Showmodes
+{
+	NONE,
+	F,
+	S,
+	R
+}
 # 仅新增瓦片（定时器增量渲染）
 func summon_add_tile()->void:
 	for i in must_add:
@@ -219,15 +231,17 @@ func summon_add_tile()->void:
 		track_bind_pool[i] = pool_idx
 		tile.polygon=point
 		tile.get_node("line").points=point
-		match tracks[i].showmodle:
-			"r":
+		match track_showmode[i]:
+			Showmodes.R:
 				tile.get_node("te").texture=r_tex
-			"f":
+			Showmodes.F:
 				tile.get_node("te").texture=f_tex
-			"s":
+			Showmodes.S:
 				tile.get_node("te").texture=s_tex
+			
+			
 		
-		tile.position=tracks[i].pos
+		tile.position=track_pos[i]
 		add_child(tile)
 
 # 仅删除离开屏幕的瓦片
@@ -253,7 +267,8 @@ func _on_play_place_tile() -> void:
 		angle=adofai_data.angledata
 		chunk_size=adofai_data.chunk_size
 		world_chunk=adofai_data.world_chunk
-		tracks=adofai_data.tracks
+		track_pos=adofai_data.tracks[0]
+		track_showmode=adofai_data.tracks[4]
 		count_chunk()
 		summon_tile()
 		#print("多边形池容量：", polygon_pool.size())

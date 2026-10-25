@@ -4,15 +4,17 @@ var is_play=false
 var cutting_time=0
 var cuttingpos=Vector2(0,0)
 @onready var play_manger=$".."
-var tracks
+var track_pos:PackedVector2Array = PackedVector2Array()
+var track_bpm:PackedFloat32Array = PackedFloat32Array()
 
 func _on_play_start_to_play() -> void:
 	if !is_play:
 		is_play=true
-		tracks=$"../../存储".adofai_data.tracks
+		track_pos=$"../../存储".adofai_data.tracks[0]
+		track_bpm=$"../../存储".adofai_data.tracks[1]
 		while play_manger.doing=="play":
 			var ball_pos=play_manger.ballpos
-			var target_pos=tracks[ball_pos].pos
+			var target_pos=track_pos[ball_pos]
 			inverse_add_follow(target_pos)
 			if Input.is_action_just_pressed("zoom_in"):
 				zoom*=1.2
@@ -24,7 +26,7 @@ func _on_play_start_to_play() -> void:
 func inverse_add_follow(player_pos:Vector2) -> void:
 	var ball_pos = play_manger.ballpos
 	var current_time = play_manger.get_time()
-	var duration = 120.0 / tracks[ball_pos].bpm
+	var duration = 120.0 / track_bpm[ball_pos]
 	var t = current_time - cutting_time
 	var x = map_range_clamp(t, 0.0, duration, cuttingpos.x, player_pos.x)
 	var y = map_range_clamp(t, 0.0, duration, cuttingpos.y, player_pos.y)

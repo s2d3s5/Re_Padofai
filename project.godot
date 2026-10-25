@@ -14,8 +14,8 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="re_padofai"
-config/version="0.1"
+config/name="Re_Padofai"
+config/version="0.2"
 run/main_scene="uid://dcw0deo7siu0j"
 config/features=PackedStringArray("4.7", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
@@ -48,7 +48,7 @@ zoom_out={
 
 [internationalization]
 
-locale/translations_pot_files=PackedStringArray("res://tscn/test.tscn", "res://tscn/info.gd")
+locale/translations_pot_files=PackedStringArray("res://main/info.gd", "res://main/test.tscn")
 
 [rendering]
 

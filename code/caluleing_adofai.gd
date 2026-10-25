@@ -76,11 +76,20 @@ class AdofaiData extends RefCounted:
 		angledata.clear()
 		for i in range(p.length()):
 			angledata.append(for_pathdata(p[i]))
-var tracks:Array[Track]=[]
+
+var track_pos:PackedVector2Array = PackedVector2Array()
+var track_way:PackedByteArray = PackedByteArray()
+var track_showmode:PackedByteArray = PackedByteArray()
+var track_bpm:PackedFloat32Array = PackedFloat32Array()
+var track_pause:PackedFloat32Array = PackedFloat32Array()
 
 func _on_calule_pressed() -> void:
 	var cuttingtime=Time.get_unix_time_from_system()
-	tracks.clear()
+	track_pos.clear()
+	track_way.clear()
+	track_showmode.clear()
+	track_bpm.clear()
+	track_pause.clear()
 	delta_angledata = []
 	times.clear()
 	world_chunk.clear()
@@ -135,7 +144,13 @@ func input_adofai_by_path(path:String)->void:
 	if json.data is Dictionary:
 		adofai_d=json.data
 	json=null
-
+enum Showmodes
+{
+	NONE,
+	F,
+	S,
+	R
+}
 
 func creat_track(data:AdofaiData)->void:
 	var pos_add=Vector2.ZERO
@@ -144,9 +159,10 @@ func creat_track(data:AdofaiData)->void:
 	var eventi:int=0
 	var way:int=1
 	var bpm=data.setting.bpm
-	tracks.clear()
+	track_pos.clear()
 	for i in range(angledata.size()+1):
-		var track=Track.new()
+		var showmode:Showmodes=Showmodes.NONE
+		var pause:float=0.0
 		#var trackevent:Array=[]
 		while eventi < events.size() and i >= events[eventi].floor:
 			#trackevent.append(events[eventi])
@@ -157,35 +173,35 @@ func creat_track(data:AdofaiData)->void:
 						match event.speedType:
 							"Bpm":
 								if event.beatsPerMinute/bpm>1.1:
-									track.showmodle="f"#f是加速方块
+									showmode=Showmodes.F#f是加速方块
 								elif event.beatsPerMinute/bpm<0.9:
-									track.showmodle="s"#s是加速方块
+									showmode=Showmodes.S#s是加速方块
 								bpm=event.beatsPerMinute
 						
 							"Multiplier":
 								if event.bpmMultiplier>1.1:
-									track.showmodle="f"#f是加速方块
+									showmode=Showmodes.F#f是加速方块
 								elif event.bpmMultiplier<0.9:
-									track.showmodle="s"#s是加速方块
+									showmode=Showmodes.S#s是加速方块
 								bpm*=event.bpmMultiplier
 							_:
 								print(str("跳过未知事件：",event))
 					else:
 						bpm=event.beatsPerMinute
 				"Twirl":
-					way*=-1
-					track.showmodle="r"#r是旋转方块
+					way=1-way#1正转，0反转
+					showmode=Showmodes.R#r是旋转方块
 				"Pause":
-					track.pause=event.duration
+					pause=event.duration
 				"PositionTrack":
 					if event.has("positionOffset"):
 						pos_add+=Vector2(event.positionOffset[0],-event.positionOffset[1])*90
 			eventi+=1
-		track.pos=pos_add
-		#track.event=trackevent
-		track.way=way
-		track.bpm=bpm
-		tracks.append(track)
+		track_pos.append(pos_add)
+		track_showmode.append(showmode)
+		track_way.append(way)
+		track_bpm.append(bpm)
+		track_pause.append(pause)
 		var angle=angledata[clampi(i,0,angledata.size()-1)]
 		if angle==999:
 			var index=1
@@ -223,22 +239,22 @@ func count_delta_angle(data)->void:
 		ii=fposmod(ii,360)
 		if ii<=0:
 			ii+=360
-		if tracks[de_i].way==-1 and not ii==360.0:
+		if track_way[de_i]*2-1==-1 and not ii==360.0:
 			ii=360-ii
 		if angledata[de_i]==999:
 			delta_angledata.append(0.0)
 		else:
 			delta_angledata.append(ii)
 
-var times:PackedFloat64Array=[]
+var times:PackedFloat32Array=[]
 func count_time(_data)->void:
 	times.clear()
 	times.append(0.0)
 	var time:float=0
 	for t_i in range(delta_angledata.size()):
-		var bpm=tracks[t_i].bpm#从0开始，即+1
+		var bpm=track_bpm[t_i]#从0开始，即+1
 		var delta_angle=delta_angledata[t_i]#从1开始，即什么也不偏
-		var pause:float=tracks[t_i].pause#以后大概有用，控一下
+		var pause:float=track_pause[t_i]#以后大概有用，控一下
 		if pause<=0:
 			time+=(delta_angle/180)*(60/bpm)
 		else:
@@ -252,9 +268,9 @@ func count_chunk(_data)->void:
 	if not(chunk_size is float):
 		chunk_size=90*4.0
 	world_chunk.clear()
-	for i in range(tracks.size()):
-		var track_pos=tracks[i].pos
-		var track_lower=(track_pos/chunk_size).floor()
+	for i in range(track_pos.size()):
+		var tile_pos=track_pos[i]
+		var track_lower=(tile_pos/chunk_size).floor()
 		track_lower=Vector2i(track_lower)
 		if world_chunk.has(track_lower):
 			world_chunk[track_lower].append(i)
@@ -305,8 +321,8 @@ func input_video(data)->void:
 
 func sending_data(data:AdofaiData)->void:
 	var save_target = $"../存储".adofai_data
-	save_target.clear()
-	save_target["tracks"] = tracks
+	save_target.clear()#    0         1         2           3         4
+	save_target["tracks"] =[track_pos,track_bpm,track_pause,track_way,track_showmode]
 	save_target["delta_angledata"] = delta_angledata
 	save_target["times"] = times
 	save_target["angledata"] = data.angledata

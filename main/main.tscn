@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://c2glfdl4yc13" path="res://main/存储.gd" id="1_a7rub"]
 [ext_resource type="Script" uid="uid://drliknqt2cl4q" path="res://code/caluleing_adofai.gd" id="2_g6ans"]
 [ext_resource type="Script" uid="uid://dc8j7un6e216y" path="res://main/openchoose.gd" id="3_8kplt"]
-[ext_resource type="Script" uid="uid://c7xve6rtxt0ks" path="res://main/JsonParser.cs" id="3_na0o7"]
 [ext_resource type="Script" uid="uid://degsbfmhkc2t6" path="res://main/calule.gd" id="4_ao1ln"]
 [ext_resource type="Script" uid="uid://cd6gqimqeuhic" path="res://main/fullscreen.gd" id="5_d2uin"]
 [ext_resource type="Script" uid="uid://dlg4uw0ikbcba" path="res://main/summon_track.gd" id="5_g6ans"]
@@ -48,9 +47,6 @@ script = ExtResource("1_a7rub")
 
 [node name="adofai计算区" type="Node" parent="." unique_id=2133084261]
 script = ExtResource("2_g6ans")
-
-[node name="JsonParser" type="Node" parent="adofai计算区" unique_id=1883773702]
-script = ExtResource("3_na0o7")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1457066073]
 
@@ -126,6 +122,12 @@ placeholder_text = "Please enter your file path here"
 offset_right = 1.0
 offset_bottom = 23.0
 script = ExtResource("5_mn4ff")
+
+[node name="busy" type="Label" parent="CanvasLayer" unique_id=1152879647]
+offset_left = 137.0
+offset_top = 5.0
+offset_right = 177.0
+offset_bottom = 28.0
 
 [node name="play" type="Node" parent="." unique_id=1484386639 node_paths=PackedStringArray("muice", "hit", "storageNode")]
 script = ExtResource("6_mn4ff")

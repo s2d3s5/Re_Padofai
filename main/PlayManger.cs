@@ -186,7 +186,7 @@ public async void _on_start_to_play()
 			int a = 0;
 			double currentTime = get_time();
 			// 顺序扫描，最多10次播放音效
-			while (ballpos < times.Length - 1 && currentTime >= times[ballpos + 1] + offest)
+			while (ballpos < times.Length - 2 && currentTime >= times[ballpos + 1] + offest)
 			{
 				ballpos++;
 				if (a <= 2)

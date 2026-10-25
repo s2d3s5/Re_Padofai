@@ -72,6 +72,7 @@ func _on_calule_pressed() -> void:
 			creat_track(data)
 			count_delta_angle(data)
 			count_time(data)
+			
 			count_chunk(data)
 			input_muice(data)
 			input_video(data)
@@ -170,7 +171,7 @@ func creat_track(data:AdofaiData)->void:
 
 var delta_angledata:PackedFloat32Array
 func count_delta_angle(data)->void:
-	var angledata:PackedFloat32Array=data.angledata
+	var angledata:PackedFloat32Array=data.angledata.duplicate()
 	delta_angledata.clear()
 	angledata.append(INF)
 	for de_i in range(angledata.size()-1):
@@ -287,4 +288,4 @@ func sending_data(data:AdofaiData)->void:
 	save_target["audio"] = stream
 	save_target["setting"]=data.setting
 	save_target["video_stream"]=video_stream
-	
+	#save_target["support_events"]

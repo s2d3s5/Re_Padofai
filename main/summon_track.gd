@@ -202,7 +202,14 @@ enum Showmodes
 	R
 }
 # 仅新增瓦片（定时器增量渲染）
+static var mid_track_point=PackedVector2Array([Vector2(-1,0.5+0.25),Vector2(1,0.5+0.25),Vector2(1,-0.75+0.25),Vector2(0,-1.75+0.25),Vector2(-1,-0.75+0.25)])
+static var t=Transform2D(0, Vector2(22.5,22.5),0, Vector2(0,0))
+
+static var lasthas:int
+@onready var busy_node:Label=$"../../CanvasLayer/busy"
+@onready var summon_timer: Timer = Timer.new()
 func summon_add_tile()->void:
+	lasthas=must_add.size()
 	for i in must_add:
 		var ang1=180
 		var ang2=0
@@ -210,17 +217,6 @@ func summon_add_tile()->void:
 			ang1=angle[i-1]+180
 		if i!=angle.size()-1:
 			ang2=angle[i]
-		if ang1==999+180:
-			var index=1
-			while angle[i+index]==999 and i>=angle.size():
-				index+=1
-			ang1=angle[i+index]-180
-		if ang2==999:
-			var index=1
-			while angle[i-index]==999 and i>=0:
-				index+=1
-			ang2=angle[i-index]+180
-		var point=get_tile_point(ang1,ang2)
 		var tile=get_a_free_polygon()
 		if tile==null:
 			print("池已耗尽，停止新增瓦片")
@@ -228,8 +224,21 @@ func summon_add_tile()->void:
 		# 绑定赛道id与池下标
 		var pool_idx = poly_to_idx[tile]
 		track_bind_pool[i] = pool_idx
-		tile.polygon=point
-		tile.get_node("line").points=point
+		if ang1==999+180:
+			var j=i-1
+			while ang1==999+180 and j>=1:
+				ang1=angle[j-1]+180
+				j-=1
+		if ang2==999:
+			var point=mid_track_point*t
+			tile.polygon=point
+			tile.get_node("line").points=point
+			tile.rotation_degrees=ang1-90
+		else:
+			var point=get_tile_point(ang1,ang2)
+			tile.polygon=point
+			tile.get_node("line").points=point
+			tile.rotation_degrees=0
 		match track_showmode[i]:
 			Showmodes.R:
 				tile.get_node("te").texture=r_tex
@@ -237,9 +246,8 @@ func summon_add_tile()->void:
 				tile.get_node("te").texture=f_tex
 			Showmodes.S:
 				tile.get_node("te").texture=s_tex
-			
-			
 		
+		lasthas-=1
 		tile.position=track_pos[i]
 		add_child(tile)
 

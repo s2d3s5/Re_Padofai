@@ -30,6 +30,7 @@ var track_way:PackedByteArray = PackedByteArray()
 var track_showmode:PackedByteArray = PackedByteArray()
 var track_bpm:PackedFloat32Array = PackedFloat32Array()
 var track_pause:PackedFloat32Array = PackedFloat32Array()
+var events:Array
 
 func _on_calule_pressed() -> void:
 	var cuttingtime=Time.get_unix_time_from_system()
@@ -72,11 +73,12 @@ func _on_calule_pressed() -> void:
 			creat_track(data)
 			count_delta_angle(data)
 			count_time(data)
-			
+			event_counting(data)
 			count_chunk(data)
 			input_muice(data)
 			input_video(data)
 			sending_data(data)
+			
 		else:
 			printerr("关卡是空的，没有任何角度数据，无法读取！")
 			return
@@ -112,7 +114,7 @@ enum Showmodes
 func creat_track(data:AdofaiData)->void:
 	var pos_add=Vector2.ZERO
 	var angledata=data.angledata
-	var events=data.actions
+	events=data.actions
 	var eventi:int=0
 	var way:int=1
 	var bpm=data.setting.bpm
@@ -217,6 +219,163 @@ func count_time(_data)->void:
 		else:
 			time+=60/(bpm/(((180/delta_angle)*pause)+1))*(delta_angle/180)
 		times.append(time)
+
+func event_counting(data:AdofaiData) ->void:
+	events=data.actions
+	var setting=data.setting
+	
+	var relativeTo=setting.relativeTo
+	var new_postion=Array(setting.position)
+	var lrelativeTo=relativeTo
+	
+	var p_s=false
+	var p_e=new_postion if relativeTo=="Player" else [null,null]
+	print(p_e,relativeTo)
+	
+	var t_s=false
+	var t_e=new_postion if relativeTo=="Tile" else [null,null]
+	
+	var g_s=false
+	var g_e=new_postion if relativeTo=="Global" else [null,null]
+	
+	var s_s=setting.zoom
+	var s_e=setting.zoom
+	var ro_s=setting.rotation
+	var ro_e=setting.rotation
+	
+	
+	var last_floor=0
+	var tile_pos
+	var power_re=true
+	
+	for act_i in range(events.size()):
+		var event=events[act_i]
+		if event.has("eventType"):
+			match event.eventType:
+				"MoveCamera":
+					if event.has("relativeTo"):
+						relativeTo=event.relativeTo
+						power_re=true
+						if lrelativeTo.to_lower()=="tile":
+							t_s=false
+						else:
+							if last_floor!=event.floor:
+								t_s=false
+						if relativeTo.to_lower()=="tile":
+							tile_pos=track_pos[event.floor]
+						if lrelativeTo!="Global":
+							g_s=false
+					else:
+						power_re=false
+					if event.has("position"):
+						new_postion=event.position
+					else:
+						new_postion=Array([null,null])
+					if "LastPosition" in relativeTo :
+						if event.has("rotation") or not event.get("rotation")==null:
+							if relativeTo=="LastPosition":
+								ro_s=ro_e
+								event.ro_s=ro_s
+								ro_e=event.rotation+ro_s
+								event.ro_e=ro_e
+							else:
+								ro_s=ro_e
+								event.ro_s=ro_s
+								ro_e=event.rotation
+								event.ro_e=ro_e
+						else:
+							ro_s=ro_e
+							event.ro_s=ro_s
+							event.ro_e=ro_e
+						relativeTo=lrelativeTo
+						if relativeTo=="Player":
+							p_s=p_e
+							event.p_s=p_s
+							p_e=arrayadd(new_postion,p_s)
+							event.p_e=p_e
+						elif relativeTo=="Tile":
+							t_s=t_e
+							event.t_s=t_s
+							t_e=arrayadd(new_postion,t_s)
+							event.t_e=t_e
+							event.tile_pos=tile_pos
+						elif relativeTo=="Global":
+							g_s=p_e
+							event.g_s=g_s
+							g_e=arrayadd(new_postion,g_s)
+							event.g_e=g_e
+					else:
+						if relativeTo=="Player":
+							if !p_s:
+								p_s=new_postion
+								event.p_s=false
+								p_e=repice_array(p_e,new_postion,power_re)
+								event.p_e=p_e
+							else:
+								p_s=p_e
+								event.p_s=p_s
+								p_e=repice_array(p_e,new_postion,power_re)
+								event.p_e=p_e
+						elif relativeTo=="Tile":
+							p_s=false
+							if !t_s:
+								t_s=new_postion
+								event.t_s=false
+								t_e=repice_array(t_e,new_postion,power_re)
+								event.t_e=t_e
+							else:
+								t_s=t_e
+								event.t_s=t_s
+								t_e=repice_array(t_e,new_postion,power_re)
+								event.t_e=t_e
+							event.tile_pos=tile_pos
+						elif relativeTo=="Global":
+							g_s=false
+							if !g_s:
+								g_s=new_postion
+								event.g_s=false
+								g_e=repice_array(g_e,new_postion,power_re)
+								event.g_e=g_e
+							else:
+								g_s=g_e
+								event.g_s=g_s
+								g_e=repice_array(g_e,new_postion,power_re)
+								event.g_e=g_e
+						lrelativeTo=relativeTo
+						if event.has("rotation")or not event.get("rotation")==null:
+								ro_s=ro_e
+								event.ro_s=ro_s
+								ro_e=event.rotation
+								event.ro_e=ro_e
+						else:
+							ro_s = ro_e
+							event.ro_s=ro_s
+							event.ro_e=ro_e
+					if event.has("zoom")or not event.get("zoom")==null:
+						s_s=s_e
+						event.s_s=s_s
+						s_e=event.zoom
+						event.s_e=s_e
+					else:
+						s_s = s_e
+						event.s_s=s_s
+						event.s_e=s_e
+					last_floor=event.floor
+					events[act_i]=event
+
+func arrayadd(a1:Array,a2:Array)->Array:
+	return Array([a1[0]+a2[0],a1[1]+a2[1]])
+	
+func repice_array(a1:Array,a2:Array,power_re:bool) -> Array:
+	if power_re:
+		return a2
+	else:
+		var asdf=a1
+		if a2[0] != null:
+			asdf[0]=a2[0]
+		if a2[1] != null:
+			asdf[1]=a2[1]
+		return asdf
 
 var chunk_size=90*4.0
 var world_chunk:Dictionary={}

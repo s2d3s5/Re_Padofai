@@ -107,7 +107,7 @@ public partial class PlayManger : Node
 
 			EmitSignal("place_tile");
 			EmitSignal("start_to_play");
-			_on_start_to_play();
+			//_on_start_to_play();
 			video_player.Set("loop",settingDict["loopVideo"].As<bool>());
 			video_player.Call("play");
 			video_player.Call("set_stream_position",video_pos);
@@ -145,20 +145,69 @@ public partial class PlayManger : Node
 			{
 				muice_node.Play();
 			}
-				
+			doing="play";
+			GD.Print("ok");
 		}
 	}
 	uint render_count=0;
 	public override void _Process(double delta)
 	{
-		base._Process(delta);
-		if (doing=="play"&&render_mode && !(get_time() >= times[ballpos + 1] + offest) )
+		if (doing == "play")
 		{
-			render_count++;
-			render_time+= (float)(1.0 / render_fps);
-			Image i=v.GetTexture().GetImage();
-			i.SaveWebp(writepath.PathJoin(render_count.ToString())+".webp",false,2f);
+				int a = 0;
+				double currentTime = get_time();
+				while (ballpos < times.Length - 2 && currentTime >= times[ballpos + 1] + offest)
+				{
+					ballpos++;
+					if (a <= 2)
+					{
+						hit.Play();
+					}
+					a++;
+					if (a>2)
+					{
+						break;
+					}
+					EmitSignal("ball_hitting", ballpos);
+					currentTime = get_time();
+				}
+				
+				if (a>2&&ballpos < times.Length - 1)
+				{
+					double target = currentTime - offest;
+					int low = ballpos;
+					int high = times.Length - 1;
+					int bestPos = ballpos;
+
+					while (low <= high)
+					{
+						int mid = (low + high) / 2;
+						if (times[mid] <= target)
+						{
+							bestPos = mid;
+							low = mid + 1;
+						}
+						else
+						{
+							high = mid - 1;
+						}
+					}
+					// 只能前进，不能后退
+					if (bestPos > ballpos)
+					{
+						ballpos = bestPos;
+					}
+				}
 		}
+	}
+	private Array events;
+	private Array play_events;
+
+
+
+	private void add_event(double time)
+	{
+		double time=get_time();
 	}
 
 	public void re_time()
@@ -177,62 +226,5 @@ public partial class PlayManger : Node
 				return (float)(Time.GetUnixTimeFromSystem() - cutting_time);
 	}
 
-public async void _on_start_to_play()
-{
-	if (doing == "play")
-	{
-		while (ballpos < times.Length - 1 && doing == "play")
-		{
-			int a = 0;
-			double currentTime = get_time();
-			// 顺序扫描，最多10次播放音效
-			while (ballpos < times.Length - 2 && currentTime >= times[ballpos + 1] + offest)
-			{
-				ballpos++;
-				if (a <= 2)
-				{
-					hit.Play();
-				}
-				a++;
-				if (a>2)
-				{
-					break;
-				}
-				EmitSignal("ball_hitting", ballpos);
-				currentTime = get_time();
-			}
-			
-			// a>10 代表本次帧已经连续触发超过10次，改用二分定位
-			if (a>2&&ballpos < times.Length - 1)
-			{
-				double target = currentTime - offest;
-				int low = ballpos;
-				int high = times.Length - 1;
-				int bestPos = ballpos;
-
-				while (low <= high)
-				{
-					int mid = (low + high) / 2;
-					if (times[mid] <= target)
-					{
-						bestPos = mid;
-						low = mid + 1;
-					}
-					else
-					{
-						high = mid - 1;
-					}
-				}
-				// 只能前进，不能后退
-				if (bestPos > ballpos)
-				{
-					ballpos = bestPos;
-				}
-			}
-			
-			await ToSignal(GetTree(), "process_frame");
-		}
-	}
-}
 
 }

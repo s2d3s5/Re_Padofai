@@ -247,12 +247,14 @@ func event_counting(data:AdofaiData) ->void:
 	var last_floor=0
 	var tile_pos
 	var power_re=true
+	var act_i=0
 	
-	for act_i in range(events.size()):
+	while act_i<events.size():
 		var event=events[act_i]
 		if event.has("eventType"):
 			match event.eventType:
 				"MoveCamera":
+					counting_time(event)
 					if event.has("relativeTo"):
 						relativeTo=event.relativeTo
 						power_re=true
@@ -362,10 +364,20 @@ func event_counting(data:AdofaiData) ->void:
 						event.s_e=s_e
 					last_floor=event.floor
 					events[act_i]=event
+					act_i+=1
+				_:
+					events.pop_at(act_i)
 
 func arrayadd(a1:Array,a2:Array)->Array:
 	return Array([a1[0]+a2[0],a1[1]+a2[1]])
+func counting_time(event :Dictionary, is_has_endtime:bool=true)->void:
+	var s=times[event.floor]+(60/track_bpm[event.floor])*(event.angleOffset/180.0)
+	event.start_time=s
+	if is_has_endtime:
+		event.end_time=s+(60/track_bpm[event.floor])*event.duration
 	
+
+
 func repice_array(a1:Array,a2:Array,power_re:bool) -> Array:
 	if power_re:
 		return a2
@@ -447,4 +459,4 @@ func sending_data(data:AdofaiData)->void:
 	save_target["audio"] = stream
 	save_target["setting"]=data.setting
 	save_target["video_stream"]=video_stream
-	#save_target["support_events"]
+	save_target["support_events"]=events
